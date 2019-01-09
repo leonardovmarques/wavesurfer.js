@@ -6,11 +6,15 @@ var wavesurfer = {};
 // Init & load audio file
 document.addEventListener('DOMContentLoaded', function() {
     wavesurfer = WaveSurfer.create({
+        barWidth: 4,
+        barRadius: 2,
+        barGap: 2,
         container: document.querySelector('#waveform'),
         plugins: [
             WaveSurfer.cursor.create({
                 showTime: true,
                 opacity: 1,
+                width: 2,
                 customShowTimeStyle: {
                     'background-color': '#000',
                     color: '#fff',

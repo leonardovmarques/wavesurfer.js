@@ -298,7 +298,8 @@ export default class MultiCanvas extends Drawer {
                         i + this.halfPixel,
                         halfH - h + offsetY,
                         bar + this.halfPixel,
-                        h * 2
+                        h * 2,
+                        this.params.barRadius
                     );
                 }
             }
@@ -467,7 +468,7 @@ export default class MultiCanvas extends Drawer {
      * @param {number} width
      * @param {number} height
      */
-    fillRect(x, y, width, height) {
+    fillRect(x, y, width, height, radius) {
         const startCanvas = Math.floor(x / this.maxCanvasWidth);
         const endCanvas = Math.min(
             Math.ceil((x + width) / this.maxCanvasWidth) + 1,
@@ -496,7 +497,8 @@ export default class MultiCanvas extends Drawer {
                     intersection.x1 - leftOffset,
                     intersection.y1,
                     intersection.x2 - intersection.x1,
-                    intersection.y2 - intersection.y1
+                    intersection.y2 - intersection.y1,
+                    radius
                 );
 
                 this.fillRectToContext(
@@ -504,7 +506,8 @@ export default class MultiCanvas extends Drawer {
                     intersection.x1 - leftOffset,
                     intersection.y1,
                     intersection.x2 - intersection.x1,
-                    intersection.y2 - intersection.y1
+                    intersection.y2 - intersection.y1,
+                    radius
                 );
             }
         }
@@ -579,11 +582,71 @@ export default class MultiCanvas extends Drawer {
      * @param {number} width
      * @param {number} height
      */
-    fillRectToContext(ctx, x, y, width, height) {
+    fillRectToContext(ctx, x, y, width, height, radius) {
         if (!ctx) {
             return;
         }
-        ctx.fillRect(x, y, width, height);
+        if (!radius) {
+            ctx.fillRect(x, y, width, height);
+        } else {
+            this.fillRoundedRect(ctx, x, y, width, height, radius);
+        }
+    }
+
+    /**
+     * Desenha um retângulo com bordas arredondadas
+     *
+     * @param {canvasContext} ctx Contexto do canvas
+     * @param {number} x Posição x do retangulo
+     * @param {number} y Posição y do rentangulo
+     * @param {number} width Comprimento do rentangulo
+     * @param {number} height Altura do rentangulo
+     * @param {number} radius Raio das bordas do retângulo
+     */
+    fillRoundedRect(ctx, x, y, width, height, radius) {
+        if (!ctx) {
+            return;
+        }
+        if (height < 0) {
+            height = Math.abs(height);
+            y = y - height;
+        }
+        if (typeof radius === 'undefined') {
+            radius = 1;
+        }
+        if (typeof radius !== 'number') {
+            radius = parseInt(radius);
+        }
+        radius = { tl: radius, tr: radius, br: radius, bl: radius };
+        // TODO: tratar caso de especificação de cada raio
+        /* else {
+            var defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
+            for (var side in defaultRadius) {
+                radius[side] = radius[side] || defaultRadius[side];
+            }
+        } */
+        ctx.beginPath();
+        if (height === 0) {
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + width, y);
+        } else {
+            ctx.moveTo(x + radius.tl, y);
+            ctx.lineTo(x + width - radius.tr, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+            ctx.lineTo(x + width, y + height - radius.br);
+            ctx.quadraticCurveTo(
+                x + width,
+                y + height,
+                x + width - radius.br,
+                y + height
+            );
+            ctx.lineTo(x + radius.bl, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+            ctx.lineTo(x, y + radius.tl);
+            ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+        }
+        ctx.closePath();
+        ctx.fill();
     }
 
     /**
