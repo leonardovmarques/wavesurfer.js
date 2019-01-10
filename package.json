@@ -1,5 +1,5 @@
 {
-  "name": "wavesurfer.js",
+  "name": "@ilinksolutions/wavesurfer.js",
   "version": "2.1.2",
   "description": "Interactive navigable audio visualization using Web Audio and Canvas",
   "main": "dist/wavesurfer.min.js",
@@ -30,7 +30,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/katspaugh/wavesurfer.js.git"
+    "url": "git://github.com/leonardovmarques/wavesurfer.js.git"
   },
   "author": "",
   "license": "BSD-3-Clause",
